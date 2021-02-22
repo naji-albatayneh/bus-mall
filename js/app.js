@@ -4,7 +4,7 @@ let counter=maxNumOfSelection;
 let selections=0;
 let arrOfProducts=[];
 
-let container=document.getElementsByClassName('imgContainer');
+let container=document.getElementById('imgContainer1');
 
 let firstImage=document.getElementById('firstImg');
 let secondImage=document.getElementById('secondImg');
@@ -94,9 +94,10 @@ function renderProducts(){
 
 renderProducts();
 
-firstImage.addEventListener('click', handleClicking);
-secondImage.addEventListener('click', handleClicking);
-thirdImage.addEventListener('click', handleClicking);
+// firstImage.addEventListener('click', handleClicking);
+// secondImage.addEventListener('click', handleClicking);
+// thirdImage.addEventListener('click', handleClicking);
+container.addEventListener('click', handleClicking);
 resultsButton.addEventListener('click', handleButtonClicking);
 
 function handleButtonClicking(event){
@@ -119,6 +120,7 @@ function handleButtonClicking(event){
 function handleClicking(event){
   selections++;
   counter--;
+  console.log(event);
   if(selections <= maxNumOfSelection){
     console.log(event.target.id);
     if(event.target.id === 'firstImg'){
@@ -137,8 +139,9 @@ function handleClicking(event){
     alert('Thanks for voting! Press OK to continue. Click the Button to show results.');
     resultsButton.hidden=false;
 
-    firstImage.removeEventListener('click', handleClicking);
-    secondImage.removeEventListener('click', handleClicking);
-    thirdImage.removeEventListener('click', handleClicking);
+    // firstImage.removeEventListener('click', handleClicking);
+    // secondImage.removeEventListener('click', handleClicking);
+    // thirdImage.removeEventListener('click', handleClicking);
+    container.removeEventListener('click', handleClicking);
   }
 }
