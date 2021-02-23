@@ -120,18 +120,19 @@ renderProducts();
 
 ///////////Chart Render////////
 function chartRendering(){
-  chart = new Chart(barChart, {
+  barChart = new Chart(barChart, {
 
     type: 'bar',
+    ticks: {min: 0},
     data: {
       labels: arrOfNames,
       datasets: [{
-        label: 'Times Selected',
+        label: 'Selected Products',
         backgroundColor: '#daa520',
         borderColor: '#daa520',
         data: arrOfSelected,
       },{
-        label: 'Times Shown',
+        label: 'Shown Products',
         backgroundColor: 'rgb(28, 158, 61)',
         borderColor:'rgb(28, 158, 61)',
         data:arrOfShown,
@@ -140,17 +141,9 @@ function chartRendering(){
     },
 
     // Configuration options go here
-    options: {
-      scales: {
-        yAxes: [{
-          ticks: {
-            min: 0,
-            stepSize: 1
-          }
-        }]
-      }
-    }
+    options: {}
   });
+
 
 }
 console.log(barChart);
