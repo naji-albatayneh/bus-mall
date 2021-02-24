@@ -1,12 +1,13 @@
 'use strict';
 let maxNumOfSelection=25;
+///////Need tracking/////
 let counter=maxNumOfSelection;
 let selections=0;
 let arrOfProducts=[];
 let arrOfNames=[];
 let arrOfSelected=[];
 let arrOfShown=[];
-
+/////////////////////////
 let container=document.getElementById('imgContainer1');
 
 let firstImage=document.getElementById('firstImg');
@@ -23,8 +24,7 @@ let indexArr=[];
 
 let barChart = document.getElementById('dataChart').getContext('2d');
 
-///////////////////
-
+///////////Constructor Function/////////
 function Product(productName, productPath){
   this.name=productName;
   this.path=productPath;
@@ -55,19 +55,19 @@ new Product('usb', 'images/usb.gif');
 new Product('water-can', 'images/water-can.jpg');
 new Product('wine-glass', 'images/wine-glass.jpg');
 
-//Copying the products name from opjects to an array
+/////////Copying the products name from opjects to an array/////////
 for(let i=0;i<arrOfProducts.length;i++){
   arrOfNames[i]=arrOfProducts[i].name;
 }
 
-//Help function
+/////////Help function////////
 function generateRandomIndex(){
   //The maximum and minimum are inclusive
   let randomIndex= Math.floor(Math.random() * arrOfProducts.length);
   return randomIndex;
 }
 
-/////Initializing indexArr with three random and unique indexes
+/////Initializing indexArr with three random and unique indexes////////
 indexArr[0]=generateRandomIndex();
 indexArr[1]=generateRandomIndex();
 indexArr[2]=generateRandomIndex();
@@ -79,7 +79,7 @@ while(indexArr[2]===indexArr[0] || indexArr[2]===indexArr[1]){
 }
 console.log('initizlizing 3 indexes: ' + indexArr);
 
-///////Generating three random, unique, and not repeated Indexes
+///////Generating three random, unique, and not repeated Indexes////////
 function irredundantIndexes(){
   for(let i=0;i<3;i++){
     index = generateRandomIndex();
@@ -93,7 +93,7 @@ function irredundantIndexes(){
   renderProducts();
 }
 
-//////Rendering Images for voting
+//////Rendering Images for voting////////
 function renderProducts(){
   firstImage.setAttribute('src', arrOfProducts[indexArr[0]].path);
   arrOfProducts[indexArr[0]].shown++;
@@ -153,10 +153,12 @@ function chartRendering(){
   });
 
 }
-console.log(barChart);
+
+////////EventListeners/////////
 container.addEventListener('click', handleClicking);
 resultsButton.addEventListener('click', handleButtonClicking);
 
+//////////Button Click///////
 function handleButtonClicking(event){
   //rendring results
   alert('You have contirbuted with 25 votes on our system. The following are your voting results.');
@@ -172,7 +174,7 @@ function handleButtonClicking(event){
   resultsButton.removeEventListener('click', handleButtonClicking);
 }
 
-
+///////////Image Click////////
 function handleClicking(event){
   selections++;
   counter--;
@@ -193,10 +195,20 @@ function handleClicking(event){
   }else{
     alert('Thanks for voting! Press OK to continue. Click the Button to show results.');
     resultsButton.hidden=false;
-
-    // firstImage.removeEventListener('click', handleClicking);
-    // secondImage.removeEventListener('click', handleClicking);
-    // thirdImage.removeEventListener('click', handleClicking);
     container.removeEventListener('click', handleClicking);
   }
+}
+
+function setToLocalStorage(){
+//Incomplete due to the limited time. Will complete everything and resubmit today in the lunch break.
+  // counter
+// selections
+// arrOfProducts
+}
+
+function getFromLocalStorage(){
+  // counter
+// selections
+// arrOfProducts
+
 }
