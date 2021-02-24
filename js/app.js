@@ -1,13 +1,12 @@
 'use strict';
 let maxNumOfSelection=25;
-///////Need tracking/////
 let counter=maxNumOfSelection;
 let selections=0;
-let arrOfProducts=[];
+let arrOfProducts=[]; //Need tracking
 let arrOfNames=[];
 let arrOfSelected=[];
 let arrOfShown=[];
-/////////////////////////
+
 let container=document.getElementById('imgContainer1');
 
 let firstImage=document.getElementById('firstImg');
@@ -15,7 +14,11 @@ let secondImage=document.getElementById('secondImg');
 let thirdImage=document.getElementById('thirdImg');
 let resultsButton=document.getElementById('btn');
 
-resultsButton.hidden=true;
+if(arrOfProducts){
+  resultsButton.hidden=false;
+}else{
+  resultsButton.hidden=true;
+}
 
 let unOrderedList = document.getElementById('unList');
 
@@ -77,7 +80,6 @@ while(indexArr[0]===indexArr[1]){
 while(indexArr[2]===indexArr[0] || indexArr[2]===indexArr[1]){
   indexArr[2]=generateRandomIndex();
 }
-console.log('initizlizing 3 indexes: ' + indexArr);
 
 ///////Generating three random, unique, and not repeated Indexes////////
 function irredundantIndexes(){
@@ -87,7 +89,6 @@ function irredundantIndexes(){
       index = generateRandomIndex();
     }
     indexArr[i]=index;
-    //console.log(indexArr[i]);
   }
   console.log('irredundantIndexes: ' + indexArr);
   renderProducts();
@@ -113,15 +114,12 @@ function renderProducts(){
   }else{
     h2.textContent=`Select an item to vote. You have ${counter} votes left`;
   }
-
 }
-
-renderProducts();
+renderProducts();//START>>
 
 ///////////Chart Render////////
 function chartRendering(){
   chart = new Chart(barChart, {
-
     type: 'bar',
     data: {
       labels: arrOfNames,
@@ -135,10 +133,8 @@ function chartRendering(){
         backgroundColor: 'rgb(28, 158, 61)',
         borderColor:'rgb(28, 158, 61)',
         data:arrOfShown,
-
       }]
     },
-
     // Configuration options go here
     options: {
       scales: {
@@ -151,7 +147,6 @@ function chartRendering(){
       }
     }
   });
-
 }
 
 ////////EventListeners/////////
@@ -160,10 +155,9 @@ resultsButton.addEventListener('click', handleButtonClicking);
 
 //////////Button Click///////
 function handleButtonClicking(event){
-  //rendring results
+  //rendring results list
   alert('You have contirbuted with 25 votes on our system. The following are your voting results.');
-  resultsButton.hidden=true;
-
+  getFromLocalStorage();
   let li;
   for(let i = 0 ; i < arrOfProducts.length; i++){
     li = document.createElement('li');
@@ -176,39 +170,43 @@ function handleButtonClicking(event){
 
 ///////////Image Click////////
 function handleClicking(event){
-  selections++;
-  counter--;
-  if(selections <= maxNumOfSelection){
-    if(event.target.id === 'firstImg'){
-      arrOfProducts[indexArr[0]].selected++;
-      arrOfSelected[indexArr[0]]=arrOfProducts[indexArr[0]].selected;
-    }else if(event.target.id === 'secondImg'){
-      arrOfProducts[indexArr[1]].selected++;
-      arrOfSelected[indexArr[1]]=arrOfProducts[indexArr[1]].selected;
-    }else if(event.target.id === 'thirdImg'){
-      arrOfProducts[indexArr[2]].selected++;
-      arrOfSelected[indexArr[2]]=arrOfProducts[indexArr[2]].selected;
-    }
-
-    irredundantIndexes();
-
-  }else{
-    alert('Thanks for voting! Press OK to continue. Click the Button to show results.');
+  if(!arrOfProducts){
+    alert('You voting data is safe. Click the Resulrs button to see the results');
+    getFromLocalStorage();
     resultsButton.hidden=false;
     container.removeEventListener('click', handleClicking);
+  }else{
+    selections++;
+    counter--;
+    if(selections <= maxNumOfSelection){
+      if(event.target.id === 'firstImg'){
+        arrOfProducts[indexArr[0]].selected++;
+        arrOfSelected[indexArr[0]]=arrOfProducts[indexArr[0]].selected;
+      }else if(event.target.id === 'secondImg'){
+        arrOfProducts[indexArr[1]].selected++;
+        arrOfSelected[indexArr[1]]=arrOfProducts[indexArr[1]].selected;
+      }else if(event.target.id === 'thirdImg'){
+        arrOfProducts[indexArr[2]].selected++;
+        arrOfSelected[indexArr[2]]=arrOfProducts[indexArr[2]].selected;
+      }
+      irredundantIndexes();
+    }else{
+      //save3
+      setToLocalStorage();
+      alert('Thanks for voting! Press OK to continue. Click the Button to show results.');
+      resultsButton.hidden=false;
+      container.removeEventListener('click', handleClicking);
+    }
   }
 }
 
 function setToLocalStorage(){
-//Incomplete due to the limited time. Will complete everything and resubmit today in the lunch break.
-  // counter
-// selections
-// arrOfProducts
+  let listIn =JSON.stringify(arrOfProducts);
+  localStorage.setItem('trackedArrOfProducts',listIn);
 }
 
 function getFromLocalStorage(){
-  // counter
-// selections
-// arrOfProducts
-
+  let retrievedList = localStorage.getItem('trackedArrOfProducts');
+  let listOut = JSON.parse(retrievedList);
+  arrOfProducts=listOut; //update
 }
