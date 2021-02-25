@@ -2,7 +2,7 @@
 let maxNumOfSelection=25;
 let counter=maxNumOfSelection;
 let selections=0;
-let arrOfProducts=[];
+let arrOfProducts=[]; //Need tracking
 let arrOfNames=[];
 let arrOfSelected=[];
 let arrOfShown=[];
@@ -14,7 +14,11 @@ let secondImage=document.getElementById('secondImg');
 let thirdImage=document.getElementById('thirdImg');
 let resultsButton=document.getElementById('btn');
 
-resultsButton.hidden=true;
+if(arrOfProducts){
+  resultsButton.hidden=false;
+}else{
+  resultsButton.hidden=true;
+}
 
 let unOrderedList = document.getElementById('unList');
 
@@ -25,8 +29,7 @@ let indexArr=[];//holding current indexes which become previous indexes in the n
 
 let barChart = document.getElementById('dataChart').getContext('2d');
 
-///////////////////
-
+///////////Constructor Function/////////
 function Product(productName, productPath){
   this.name=productName;
   this.path=productPath;
@@ -62,14 +65,14 @@ for(let i=0;i<arrOfProducts.length;i++){
   arrOfNames[i]=arrOfProducts[i].name;
 }
 
-//Help function
+/////////Help function////////
 function generateRandomIndex(){
   //The maximum and minimum are inclusive
   let randomIndex= Math.floor(Math.random() * arrOfProducts.length);
   return randomIndex;
 }
 
-/////Initializing indexArr with three random and unique indexes
+/////Initializing indexArr with three random and unique indexes////////
 indexArr[0]=generateRandomIndex();
 indexArr[1]=generateRandomIndex();
 indexArr[2]=generateRandomIndex();
@@ -79,6 +82,7 @@ while(indexArr[1]===indexArr[0]){
 while(indexArr[2]===indexArr[0] || indexArr[2]===indexArr[1]){
   indexArr[2]=generateRandomIndex();
 }
+
 console.log('Initial indexes: ' + indexArr);
 
 ///////Random & Unique & Not Repeated Indexes////////
@@ -99,6 +103,16 @@ function irredundantIndexes(){
   //Random & Not Repeated //3rd Index
   while(indexArr.includes(index2) || index2===index1 || index2===index0){
     index2 = generateRandomIndex();
+
+///////Generating three random, unique, and not repeated Indexes////////
+function irredundantIndexes(){
+  for(let i=0;i<3;i++){
+    index = generateRandomIndex();
+    while(index===indexArr[0] || index===indexArr[1] || index===indexArr[2]){
+      index = generateRandomIndex();
+    }
+    indexArr[i]=index;
+
   }
   indexArr[0]=index0;
   indexArr[1]=index1;
@@ -107,7 +121,7 @@ function irredundantIndexes(){
   renderProducts();
 }
 
-//////Rendering Images for voting//////
+//////Rendering Images for voting////////
 function renderProducts(){
   firstImage.setAttribute('src', arrOfProducts[indexArr[0]].path);
   arrOfProducts[indexArr[0]].shown++;
@@ -128,13 +142,11 @@ function renderProducts(){
     h2.textContent=`Select an item to vote. You have ${counter} votes left`;
   }
 }
-
-renderProducts();
+renderProducts();//START>>
 
 ///////////Chart Render////////
 function chartRendering(){
   chart = new Chart(barChart, {
-
     type: 'bar',
     data: {
       labels: arrOfNames,
@@ -148,7 +160,6 @@ function chartRendering(){
         backgroundColor: 'rgb(28, 158, 61)',
         borderColor:'rgb(28, 158, 61)',
         data:arrOfShown,
-
       }]
     },
     options: {
@@ -162,7 +173,6 @@ function chartRendering(){
       }
     }
   });
-
 }
 
 /////////Event Listeners/////////
@@ -171,10 +181,9 @@ resultsButton.addEventListener('click', handleButtonClicking);
 
 //////////Clicking Resuls Button////////
 function handleButtonClicking(event){
-  //rendring results
+  //rendring results list
   alert('You have contirbuted with 25 votes on our system. The following are your voting results.');
-  resultsButton.hidden=true;
-
+  getFromLocalStorage();
   let li;
   for(let i = 0 ; i < arrOfProducts.length; i++){
     li = document.createElement('li');
@@ -187,25 +196,43 @@ function handleButtonClicking(event){
 
 ///////////Clicking on Images/////////
 function handleClicking(event){
-  selections++;
-  counter--;
-  if(selections <= maxNumOfSelection){
-    if(event.target.id === 'firstImg'){
-      arrOfProducts[indexArr[0]].selected++;
-      arrOfSelected[indexArr[0]]=arrOfProducts[indexArr[0]].selected;
-    }else if(event.target.id === 'secondImg'){
-      arrOfProducts[indexArr[1]].selected++;
-      arrOfSelected[indexArr[1]]=arrOfProducts[indexArr[1]].selected;
-    }else if(event.target.id === 'thirdImg'){
-      arrOfProducts[indexArr[2]].selected++;
-      arrOfSelected[indexArr[2]]=arrOfProducts[indexArr[2]].selected;
-    }
-
-    irredundantIndexes();
-
-  }else{
-    alert('Thanks for voting! Press OK to continue. Click the Button to show results.');
+  if(!arrOfProducts){
+    alert('You voting data is safe. Click the Resulrs button to see the results');
+    getFromLocalStorage();
     resultsButton.hidden=false;
     container.removeEventListener('click', handleClicking);
+  }else{
+    selections++;
+    counter--;
+    if(selections <= maxNumOfSelection){
+      if(event.target.id === 'firstImg'){
+        arrOfProducts[indexArr[0]].selected++;
+        arrOfSelected[indexArr[0]]=arrOfProducts[indexArr[0]].selected;
+      }else if(event.target.id === 'secondImg'){
+        arrOfProducts[indexArr[1]].selected++;
+        arrOfSelected[indexArr[1]]=arrOfProducts[indexArr[1]].selected;
+      }else if(event.target.id === 'thirdImg'){
+        arrOfProducts[indexArr[2]].selected++;
+        arrOfSelected[indexArr[2]]=arrOfProducts[indexArr[2]].selected;
+      }
+      irredundantIndexes();
+    }else{
+      //save3
+      setToLocalStorage();
+      alert('Thanks for voting! Press OK to continue. Click the Button to show results.');
+      resultsButton.hidden=false;
+      container.removeEventListener('click', handleClicking);
+    }
   }
+}
+
+function setToLocalStorage(){
+  let listIn =JSON.stringify(arrOfProducts);
+  localStorage.setItem('trackedArrOfProducts',listIn);
+}
+
+function getFromLocalStorage(){
+  let retrievedList = localStorage.getItem('trackedArrOfProducts');
+  let listOut = JSON.parse(retrievedList);
+  arrOfProducts=listOut; //update
 }
