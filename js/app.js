@@ -18,8 +18,10 @@ resultsButton.hidden=true;
 
 let unOrderedList = document.getElementById('unList');
 
-let index = generateRandomIndex();
-let indexArr=[];
+let index0;//to generate current 1st index
+let index1;//to generate current 2nd index
+let index2;//to generate current 3rd index
+let indexArr=[];//holding current indexes which become previous indexes in the next subsequent iteration
 
 let barChart = document.getElementById('dataChart').getContext('2d');
 
@@ -55,7 +57,7 @@ new Product('usb', 'images/usb.gif');
 new Product('water-can', 'images/water-can.jpg');
 new Product('wine-glass', 'images/wine-glass.jpg');
 
-//Copying the products name from opjects to an array
+//Copying the products name from opjects to a data array to be used in the chart
 for(let i=0;i<arrOfProducts.length;i++){
   arrOfNames[i]=arrOfProducts[i].name;
 }
@@ -71,29 +73,41 @@ function generateRandomIndex(){
 indexArr[0]=generateRandomIndex();
 indexArr[1]=generateRandomIndex();
 indexArr[2]=generateRandomIndex();
-while(indexArr[0]===indexArr[1]){
+while(indexArr[1]===indexArr[0]){
   indexArr[1]=generateRandomIndex();
 }
 while(indexArr[2]===indexArr[0] || indexArr[2]===indexArr[1]){
   indexArr[2]=generateRandomIndex();
 }
-console.log('initizlizing 3 indexes: ' + indexArr);
+console.log('Initial indexes: ' + indexArr);
 
-///////Generating three random, unique, and not repeated Indexes
+///////Random & Unique & Not Repeated Indexes////////
 function irredundantIndexes(){
-  for(let i=0;i<3;i++){
-    index = generateRandomIndex();
-    while(index===indexArr[0] || index===indexArr[1] || index===indexArr[2]){
-      index = generateRandomIndex();
-    }
-    indexArr[i]=index;
-    //console.log(indexArr[i]);
+
+  index0 = generateRandomIndex();
+  index1 = generateRandomIndex();
+  index2 = generateRandomIndex();
+
+  //Random & Not Repeated //1st Index
+  while(indexArr.includes(index0)){
+    index0 = generateRandomIndex();
   }
-  console.log('irredundantIndexes: ' + indexArr);
+  //Random & Not Repeated //2nd Index
+  while(indexArr.includes(index1) || index1===index0){
+    index1 = generateRandomIndex();
+  }
+  //Random & Not Repeated //3rd Index
+  while(indexArr.includes(index2) || index2===index1 || index2===index0){
+    index2 = generateRandomIndex();
+  }
+  indexArr[0]=index0;
+  indexArr[1]=index1;
+  indexArr[2]=index2;
+  console.log('Not Repeated indexes: ' + indexArr);
   renderProducts();
 }
 
-//////Rendering Images for voting
+//////Rendering Images for voting//////
 function renderProducts(){
   firstImage.setAttribute('src', arrOfProducts[indexArr[0]].path);
   arrOfProducts[indexArr[0]].shown++;
@@ -113,7 +127,6 @@ function renderProducts(){
   }else{
     h2.textContent=`Select an item to vote. You have ${counter} votes left`;
   }
-
 }
 
 renderProducts();
@@ -138,8 +151,6 @@ function chartRendering(){
 
       }]
     },
-
-    // Configuration options go here
     options: {
       scales: {
         yAxes: [{
@@ -153,10 +164,12 @@ function chartRendering(){
   });
 
 }
-console.log(barChart);
+
+/////////Event Listeners/////////
 container.addEventListener('click', handleClicking);
 resultsButton.addEventListener('click', handleButtonClicking);
 
+//////////Clicking Resuls Button////////
 function handleButtonClicking(event){
   //rendring results
   alert('You have contirbuted with 25 votes on our system. The following are your voting results.');
@@ -172,7 +185,7 @@ function handleButtonClicking(event){
   resultsButton.removeEventListener('click', handleButtonClicking);
 }
 
-
+///////////Clicking on Images/////////
 function handleClicking(event){
   selections++;
   counter--;
@@ -193,10 +206,6 @@ function handleClicking(event){
   }else{
     alert('Thanks for voting! Press OK to continue. Click the Button to show results.');
     resultsButton.hidden=false;
-
-    // firstImage.removeEventListener('click', handleClicking);
-    // secondImage.removeEventListener('click', handleClicking);
-    // thirdImage.removeEventListener('click', handleClicking);
     container.removeEventListener('click', handleClicking);
   }
 }
