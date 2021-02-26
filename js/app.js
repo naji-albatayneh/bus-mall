@@ -17,8 +17,10 @@ let resultsButton=document.getElementById('btn');
 
 let unOrderedList = document.getElementById('unList');
 
-let index = generateRandomIndex();
-let indexArr=[];
+let index0;//to generate current 1st index
+let index1;//to generate current 2nd index
+let index2;//to generate current 3rd index
+let indexArr=[];//holding current indexes which become previous indexes in the next subsequent iteration
 
 let barChart = document.getElementById('dataChart').getContext('2d');
 
@@ -53,7 +55,6 @@ new Product('usb', 'images/usb.gif');
 new Product('water-can', 'images/water-can.jpg');
 new Product('wine-glass', 'images/wine-glass.jpg');
 
-
 /////////Help function////////
 function generateRandomIndex(){
   //The maximum and minimum are inclusive
@@ -61,27 +62,41 @@ function generateRandomIndex(){
   return randomIndex;
 }
 
-/////Initializing indexArr with three random and unique indexes////////
+/////Initializing indexArr with three random and unique indexes
 indexArr[0]=generateRandomIndex();
 indexArr[1]=generateRandomIndex();
 indexArr[2]=generateRandomIndex();
-while(indexArr[0]===indexArr[1]){
+while(indexArr[1]===indexArr[0]){
   indexArr[1]=generateRandomIndex();
 }
 while(indexArr[2]===indexArr[0] || indexArr[2]===indexArr[1]){
   indexArr[2]=generateRandomIndex();
 }
+console.log('Initial indexes: ' + indexArr);
 
-///////Generating three random, unique, and not repeated Indexes////////
+///////Random & Unique & Not Repeated Indexes////////
 function irredundantIndexes(){
-  for(let i=0;i<3;i++){
-    index = generateRandomIndex();
-    while(index===indexArr[0] || index===indexArr[1] || index===indexArr[2]){
-      index = generateRandomIndex();
-    }
-    indexArr[i]=index;
+
+  index0 = generateRandomIndex();
+  index1 = generateRandomIndex();
+  index2 = generateRandomIndex();
+
+  //Random & Not Repeated //1st Index
+  while(indexArr.includes(index0)){
+    index0 = generateRandomIndex();
   }
-  console.log('irredundantIndexes: ' + indexArr);
+  //Random & Not Repeated //2nd Index
+  while(indexArr.includes(index1) || index1===index0){
+    index1 = generateRandomIndex();
+  }
+  //Random & Not Repeated //3rd Index
+  while(indexArr.includes(index2) || index2===index1 || index2===index0){
+    index2 = generateRandomIndex();
+  }
+  indexArr[0]=index0;
+  indexArr[1]=index1;
+  indexArr[2]=index2;
+  console.log('Not Repeated indexes: ' + indexArr);
   renderProducts();
 }
 
@@ -129,7 +144,6 @@ function chartRendering(){
         data:arrOfShown,
       }]
     },
-    // Configuration options go here
     options: {
       scales: {
         yAxes: [{
@@ -143,9 +157,10 @@ function chartRendering(){
   });
 }
 
-////////EventListeners/////////
+/////////Event Listeners/////////
 container.addEventListener('click', handleClicking);
 resultsButton.addEventListener('click', handleButtonClicking);
+
 
 /////////Copying the products name from opjects to an array/////////
 if(!arrOfProducts){
@@ -155,8 +170,7 @@ for(let i=0;i<arrOfProducts.length;i++){
   arrOfNames[i]=arrOfProducts[i].name;
 }
 
-
-//////////Button Click///////
+//////////Clicking Resuls Button////////
 function handleButtonClicking(event){
   //rendring results list
   if(!arrOfProducts){
@@ -177,7 +191,7 @@ function handleButtonClicking(event){
   resultsButton.removeEventListener('click', handleButtonClicking);
 }
 
-///////////Image Click////////
+///////////Clicking on Images/////////
 function handleClicking(event){
 
   selections++;
