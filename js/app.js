@@ -14,11 +14,6 @@ let secondImage=document.getElementById('secondImg');
 let thirdImage=document.getElementById('thirdImg');
 let resultsButton=document.getElementById('btn');
 
-if(arrOfProducts){
-  resultsButton.hidden=false;
-}else{
-  resultsButton.hidden=true;
-}
 
 let unOrderedList = document.getElementById('unList');
 
@@ -60,11 +55,6 @@ new Product('usb', 'images/usb.gif');
 new Product('water-can', 'images/water-can.jpg');
 new Product('wine-glass', 'images/wine-glass.jpg');
 
-//Copying the products name from opjects to a data array to be used in the chart
-for(let i=0;i<arrOfProducts.length;i++){
-  arrOfNames[i]=arrOfProducts[i].name;
-}
-
 /////////Help function////////
 function generateRandomIndex(){
   //The maximum and minimum are inclusive
@@ -72,7 +62,7 @@ function generateRandomIndex(){
   return randomIndex;
 }
 
-/////Initializing indexArr with three random and unique indexes////////
+/////Initializing indexArr with three random and unique indexes
 indexArr[0]=generateRandomIndex();
 indexArr[1]=generateRandomIndex();
 indexArr[2]=generateRandomIndex();
@@ -82,7 +72,6 @@ while(indexArr[1]===indexArr[0]){
 while(indexArr[2]===indexArr[0] || indexArr[2]===indexArr[1]){
   indexArr[2]=generateRandomIndex();
 }
-
 console.log('Initial indexes: ' + indexArr);
 
 ///////Random & Unique & Not Repeated Indexes////////
@@ -103,16 +92,6 @@ function irredundantIndexes(){
   //Random & Not Repeated //3rd Index
   while(indexArr.includes(index2) || index2===index1 || index2===index0){
     index2 = generateRandomIndex();
-
-///////Generating three random, unique, and not repeated Indexes////////
-function irredundantIndexes(){
-  for(let i=0;i<3;i++){
-    index = generateRandomIndex();
-    while(index===indexArr[0] || index===indexArr[1] || index===indexArr[2]){
-      index = generateRandomIndex();
-    }
-    indexArr[i]=index;
-
   }
   indexArr[0]=index0;
   indexArr[1]=index1;
@@ -136,16 +115,19 @@ function renderProducts(){
   arrOfShown[indexArr[2]]=arrOfProducts[indexArr[2]].shown;
 
   let h2=document.getElementById('headerTwo');
-  if(counter===0){
+  if(counter===1){
     h2.textContent='Thanks! You have done 25 votes. Click to show the results';
+    resultsButton.hidden=false;
   }else{
     h2.textContent=`Select an item to vote. You have ${counter} votes left`;
+    resultsButton.hidden=true;
   }
 }
 renderProducts();//START>>
 
 ///////////Chart Render////////
 function chartRendering(){
+  resultsButton.hidden=true;
   chart = new Chart(barChart, {
     type: 'bar',
     data: {
@@ -179,11 +161,26 @@ function chartRendering(){
 container.addEventListener('click', handleClicking);
 resultsButton.addEventListener('click', handleButtonClicking);
 
+
+/////////Copying the products name from opjects to an array/////////
+if(!arrOfProducts){
+  getFromLocalStorage();
+}
+for(let i=0;i<arrOfProducts.length;i++){
+  arrOfNames[i]=arrOfProducts[i].name;
+}
+
 //////////Clicking Resuls Button////////
 function handleButtonClicking(event){
   //rendring results list
-  alert('You have contirbuted with 25 votes on our system. The following are your voting results.');
-  getFromLocalStorage();
+  if(!arrOfProducts){
+    alert('Your voting data is safe. Click the Resulrs button to see the results');
+    getFromLocalStorage();
+  }else{
+    setToLocalStorage();
+    resultsButton.hidden=true;
+    alert('You have contirbuted with 25 votes on our system. The following are your voting results.');
+  }
   let li;
   for(let i = 0 ; i < arrOfProducts.length; i++){
     li = document.createElement('li');
@@ -196,34 +193,29 @@ function handleButtonClicking(event){
 
 ///////////Clicking on Images/////////
 function handleClicking(event){
-  if(!arrOfProducts){
-    alert('You voting data is safe. Click the Resulrs button to see the results');
-    getFromLocalStorage();
+
+  selections++;
+  counter--;
+  if(selections <= maxNumOfSelection){
+    if(event.target.id === 'firstImg'){
+      arrOfProducts[indexArr[0]].selected++;
+      arrOfSelected[indexArr[0]]=arrOfProducts[indexArr[0]].selected;
+    }else if(event.target.id === 'secondImg'){
+      arrOfProducts[indexArr[1]].selected++;
+      arrOfSelected[indexArr[1]]=arrOfProducts[indexArr[1]].selected;
+    }else if(event.target.id === 'thirdImg'){
+      arrOfProducts[indexArr[2]].selected++;
+      arrOfSelected[indexArr[2]]=arrOfProducts[indexArr[2]].selected;
+    }
+    irredundantIndexes();
+  }else{
+    //save3
+    setToLocalStorage();
+    alert('Thanks for voting! Press OK to continue. Click the Button to show results.');
     resultsButton.hidden=false;
     container.removeEventListener('click', handleClicking);
-  }else{
-    selections++;
-    counter--;
-    if(selections <= maxNumOfSelection){
-      if(event.target.id === 'firstImg'){
-        arrOfProducts[indexArr[0]].selected++;
-        arrOfSelected[indexArr[0]]=arrOfProducts[indexArr[0]].selected;
-      }else if(event.target.id === 'secondImg'){
-        arrOfProducts[indexArr[1]].selected++;
-        arrOfSelected[indexArr[1]]=arrOfProducts[indexArr[1]].selected;
-      }else if(event.target.id === 'thirdImg'){
-        arrOfProducts[indexArr[2]].selected++;
-        arrOfSelected[indexArr[2]]=arrOfProducts[indexArr[2]].selected;
-      }
-      irredundantIndexes();
-    }else{
-      //save3
-      setToLocalStorage();
-      alert('Thanks for voting! Press OK to continue. Click the Button to show results.');
-      resultsButton.hidden=false;
-      container.removeEventListener('click', handleClicking);
-    }
   }
+
 }
 
 function setToLocalStorage(){
