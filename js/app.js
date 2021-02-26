@@ -14,11 +14,6 @@ let secondImage=document.getElementById('secondImg');
 let thirdImage=document.getElementById('thirdImg');
 let resultsButton=document.getElementById('btn');
 
-if(arrOfProducts){
-  resultsButton.hidden=false;
-}else{
-  resultsButton.hidden=true;
-}
 
 let unOrderedList = document.getElementById('unList');
 
@@ -58,10 +53,6 @@ new Product('usb', 'images/usb.gif');
 new Product('water-can', 'images/water-can.jpg');
 new Product('wine-glass', 'images/wine-glass.jpg');
 
-/////////Copying the products name from opjects to an array/////////
-for(let i=0;i<arrOfProducts.length;i++){
-  arrOfNames[i]=arrOfProducts[i].name;
-}
 
 /////////Help function////////
 function generateRandomIndex(){
@@ -109,16 +100,19 @@ function renderProducts(){
   arrOfShown[indexArr[2]]=arrOfProducts[indexArr[2]].shown;
 
   let h2=document.getElementById('headerTwo');
-  if(counter===0){
+  if(counter===1){
     h2.textContent='Thanks! You have done 25 votes. Click to show the results';
+    resultsButton.hidden=false;
   }else{
     h2.textContent=`Select an item to vote. You have ${counter} votes left`;
+    resultsButton.hidden=true;
   }
 }
 renderProducts();//START>>
 
 ///////////Chart Render////////
 function chartRendering(){
+  resultsButton.hidden=true;
   chart = new Chart(barChart, {
     type: 'bar',
     data: {
@@ -153,11 +147,26 @@ function chartRendering(){
 container.addEventListener('click', handleClicking);
 resultsButton.addEventListener('click', handleButtonClicking);
 
+/////////Copying the products name from opjects to an array/////////
+if(!arrOfProducts){
+  getFromLocalStorage();
+}
+for(let i=0;i<arrOfProducts.length;i++){
+  arrOfNames[i]=arrOfProducts[i].name;
+}
+
+
 //////////Button Click///////
 function handleButtonClicking(event){
   //rendring results list
-  alert('You have contirbuted with 25 votes on our system. The following are your voting results.');
-  getFromLocalStorage();
+  if(!arrOfProducts){
+    alert('Your voting data is safe. Click the Resulrs button to see the results');
+    getFromLocalStorage();
+  }else{
+    setToLocalStorage();
+    resultsButton.hidden=true;
+    alert('You have contirbuted with 25 votes on our system. The following are your voting results.');
+  }
   let li;
   for(let i = 0 ; i < arrOfProducts.length; i++){
     li = document.createElement('li');
@@ -170,34 +179,29 @@ function handleButtonClicking(event){
 
 ///////////Image Click////////
 function handleClicking(event){
-  if(!arrOfProducts){
-    alert('You voting data is safe. Click the Resulrs button to see the results');
-    getFromLocalStorage();
+
+  selections++;
+  counter--;
+  if(selections <= maxNumOfSelection){
+    if(event.target.id === 'firstImg'){
+      arrOfProducts[indexArr[0]].selected++;
+      arrOfSelected[indexArr[0]]=arrOfProducts[indexArr[0]].selected;
+    }else if(event.target.id === 'secondImg'){
+      arrOfProducts[indexArr[1]].selected++;
+      arrOfSelected[indexArr[1]]=arrOfProducts[indexArr[1]].selected;
+    }else if(event.target.id === 'thirdImg'){
+      arrOfProducts[indexArr[2]].selected++;
+      arrOfSelected[indexArr[2]]=arrOfProducts[indexArr[2]].selected;
+    }
+    irredundantIndexes();
+  }else{
+    //save3
+    setToLocalStorage();
+    alert('Thanks for voting! Press OK to continue. Click the Button to show results.');
     resultsButton.hidden=false;
     container.removeEventListener('click', handleClicking);
-  }else{
-    selections++;
-    counter--;
-    if(selections <= maxNumOfSelection){
-      if(event.target.id === 'firstImg'){
-        arrOfProducts[indexArr[0]].selected++;
-        arrOfSelected[indexArr[0]]=arrOfProducts[indexArr[0]].selected;
-      }else if(event.target.id === 'secondImg'){
-        arrOfProducts[indexArr[1]].selected++;
-        arrOfSelected[indexArr[1]]=arrOfProducts[indexArr[1]].selected;
-      }else if(event.target.id === 'thirdImg'){
-        arrOfProducts[indexArr[2]].selected++;
-        arrOfSelected[indexArr[2]]=arrOfProducts[indexArr[2]].selected;
-      }
-      irredundantIndexes();
-    }else{
-      //save3
-      setToLocalStorage();
-      alert('Thanks for voting! Press OK to continue. Click the Button to show results.');
-      resultsButton.hidden=false;
-      container.removeEventListener('click', handleClicking);
-    }
   }
+
 }
 
 function setToLocalStorage(){
